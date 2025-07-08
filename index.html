@@ -4,357 +4,1313 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Календарь отгрузок</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary: #5e35b1;
+            --primary-light: #7e57c2;
+            --secondary: #3949ab;
+            --accent: #ff7043;
+            --success: #43a047;
+            --warning: #fb8c00;
+            --danger: #e53935;
+            --info: #039be5;
+            --light: #f5f5f5;
+            --dark: #263238;
+            --gray: #90a4ae;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 0;
         }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            min-height: 100vh;
+        }
+
         .container {
-            max-width: 1200px;
+            display: flex;
+            width: 100%;
+            max-width: 1800px;
             margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            gap: 20px;
         }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-container {
+            background: rgba(94, 53, 177, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .stats-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stats-chart {
+            margin-top: 25px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .chart-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .direction-stats {
+            margin-top: 10px;
+        }
+
+        .direction-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .direction-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+
+        .direction-count {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .content-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        /* Header */
         .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .btn {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .btn-secondary {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-info {
+            background-color: var(--info);
+        }
+
+        /* Month navigation */
         .month-nav {
             display: flex;
-            gap: 15px;
             align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
-        .month-nav button {
-            padding: 5px 10px;
+
+        .month-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: var(--light);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark);
         }
-        .current-month {
-            font-size: 1.5em;
-            font-weight: bold;
+
+        .nav-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
         }
-        table {
+
+        /* Calendar */
+        .calendar {
             width: 100%;
-            border-collapse: collapse;
+            padding: 20px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .day-header {
+            padding: 10px;
             text-align: center;
         }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
+
         .day-cell {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 12px;
+            min-height: 120px;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
             cursor: pointer;
-            height: 100px;
-            vertical-align: top;
+            position: relative;
+            overflow: hidden;
         }
+
         .day-cell:hover {
-            background-color: #f0f0f0;
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+            border-color: var(--primary-light);
         }
+
         .day-number {
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 5px;
+            font-size: 16px;
+            color: var(--dark);
         }
+
+        .other-month {
+            color: var(--gray);
+            background-color: rgba(144, 164, 174, 0.05);
+        }
+
+        .today {
+            background-color: rgba(94, 53, 177, 0.1);
+            border: 2px solid var(--primary);
+        }
+
         .day-of-week {
-            font-size: 0.8em;
-            color: #666;
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
-        .active-day {
-            background-color: #e6f7ff;
-            border: 2px solid #1890ff;
+
+        .shipment-badge {
+            background-color: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-weight: 600;
         }
-        .modal {
-            display: none;
+
+        .shipment-preview {
+            font-size: 12px;
+            margin-top: 5px;
+            padding: 5px;
+            background: rgba(94, 53, 177, 0.08);
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--dark);
+        }
+
+        /* Status indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-shipped {
+            background-color: var(--success);
+        }
+
+        .status-barcode-needed {
+            background-color: var(--warning);
+        }
+
+        .status-assembled {
+            background-color: var(--info);
+        }
+
+        /* Day Modal */
+        .day-modal {
             position: fixed;
-            z-index: 1;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
         }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
+
+        .day-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .day-modal-content {
+            background-color: var(--card-bg);
+            width: 90%;
             max-width: 900px;
-            border-radius: 5px;
+            max-height: 85vh;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: var(--transition);
         }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+
+        .day-modal.active .day-modal-content {
+            transform: translateY(0);
+        }
+
+        .day-modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-modal-header::before {
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .day-modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
             cursor: pointer;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
         }
-        .close:hover {
-            color: black;
+
+        .close-modal:hover {
+            transform: rotate(90deg);
         }
-        .form-group {
+
+        .day-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(85vh - 120px);
+        }
+
+        .shipments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Shipment Card */
+        .shipment-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shipment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .shipment-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .shipment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .shipment-direction {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .shipment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(0,0,0,0.05);
+            color: var(--primary);
+        }
+
+        .shipment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            font-size: 14px;
             margin-bottom: 15px;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        input[type="text"], input[type="number"], select {
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--gray);
+            min-width: 100px;
+        }
+
+        .detail-value {
+            color: var(--dark);
+        }
+
+        .checkmark {
+            color: var(--success);
+        }
+
+        .crossmark {
+            color: var(--danger);
+        }
+
+        /* Status Section */
+        .status-section {
+            background: rgba(0,0,0,0.02);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-btn {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.1);
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .status-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .status-btn.shipped {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .status-btn.shipped.active {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-btn.barcode-needed {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .status-btn.barcode-needed.active {
+            background: var(--warning);
+            color: white;
+        }
+
+        .status-btn.assembled {
+            border-color: var(--info);
+            color: var(--info);
+        }
+
+        .status-btn.assembled.active {
+            background: var(--info);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: rgba(144, 164, 174, 0.3);
+        }
+
+        .empty-state p {
+            margin-top: 10px;
+            color: var(--gray);
+        }
+
+        .add-shipment-btn {
+            margin-top: 20px;
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
         }
+
+        /* Form Modal */
+        .shipment-form-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .shipment-form-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .shipment-form-content {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 700px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .shipment-form-modal.active .shipment-form-content {
+            transform: translateY(0);
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-header::before {
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .form-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            font-family: 'Roboto', sans-serif;
+            font-size: 15px;
+            transition: var(--transition);
+            background: var(--card-bg);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.2);
+        }
+
         .checkbox-group {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
-        .checkbox-group input {
-            margin-right: 10px;
-        }
-        .btn {
-            padding: 8px 15px;
-            background-color: #1890ff;
-            color: white;
-            border: none;
-            border-radius: 4px;
+
+        .checkbox-label {
+            margin: 0;
             cursor: pointer;
-            margin-right: 10px;
+            font-size: 14px;
         }
-        .btn:hover {
-            background-color: #40a9ff;
+
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding: 20px;
+            border-top: 1px solid rgba(0,0,0,0.05);
         }
-        .btn-secondary {
-            background-color: #f0f0f0;
-            color: #333;
+
+        .package-type {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
         }
-        .shipment-item {
-            margin-bottom: 5px;
-            font-size: 0.9em;
+
+        .type-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
         }
-        .checkmark {
-            color: green;
+
+        .type-option.active {
+            border-color: var(--primary);
+            background: rgba(94, 53, 177, 0.05);
+        }
+
+        .type-option i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .type-option.active i {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1600px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .month-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .calendar-header, .calendar-body {
+                grid-template-columns: repeat(7, minmax(0, 1fr));
+            }
+            
+            .day-cell {
+                min-height: 80px;
+                padding: 8px;
+            }
+            
+            .shipment-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .day-modal-content, .shipment-form-content {
+                width: 95%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .btn {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+            
+            .form-body {
+                padding: 15px;
+            }
+            
+            .shipment-card {
+                padding: 12px;
+            }
+            
+            .shipment-direction {
+                font-size: 16px;
+            }
+            
+            .package-type {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Календарь отгрузок</h1>
-            <button class="btn" id="addShipmentBtn">Добавить отгрузку</button>
+        <!-- Левая панель - Статистика -->
+        <div class="sidebar">
+            <div class="sidebar-title">
+                <i class="fas fa-chart-bar"></i> Статистика отгрузок
+            </div>
+            
+            <div class="stats-container">
+                <div class="stats-item">
+                    <span class="stats-label">Всего отгрузок:</span>
+                    <span class="stats-value" id="totalShipments">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">Отгружено:</span>
+                    <span class="stats-value" id="shippedCount">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-label">В работе:</span>
+                    <span class="stats-value" id="inProgressCount">0</span>
+                </div>
+            </div>
+            
+            <div class="stats-chart">
+                <div class="chart-title">
+                    <i class="fas fa-map-marker-alt"></i> Направления
+                </div>
+                <div class="direction-stats" id="directionStats">
+                    <!-- Статистика по направлениям будет здесь -->
+                </div>
+            </div>
         </div>
         
-        <div class="month-nav">
-            <button id="prevMonth">&lt; Предыдущий</button>
-            <div class="current-month" id="currentMonth">Июль 2023</div>
-            <button id="nextMonth">Следующий &gt;</button>
+        <!-- Основной контент -->
+        <div class="main-content">
+            <div class="content-container">
+                <div class="header">
+                    <h1><i class="fas fa-shipping-fast"></i> Календарь отгрузок</h1>
+                    <button class="btn" id="addShipmentBtn">
+                        <i class="fas fa-plus"></i> Новая отгрузка
+                    </button>
+                </div>
+                
+                <div class="month-nav">
+                    <div class="month-title" id="currentMonth">Июль 2023</div>
+                    <div class="nav-buttons">
+                        <button class="nav-btn" id="prevMonth">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="nav-btn" id="todayBtn">
+                            Сегодня
+                        </button>
+                        <button class="nav-btn" id="nextMonth">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <div class="day-header">Понедельник</div>
+                        <div class="day-header">Вторник</div>
+                        <div class="day-header">Среда</div>
+                        <div class="day-header">Четверг</div>
+                        <div class="day-header">Пятница</div>
+                        <div class="day-header">Суббота</div>
+                        <div class="day-header">Воскресенье</div>
+                    </div>
+                    <div class="calendar-body" id="calendarBody">
+                        <!-- Календарь будет заполнен JavaScript -->
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <table id="calendar">
-            <thead>
-                <tr>
-                    <th>Пн</th>
-                    <th>Вт</th>
-                    <th>Ср</th>
-                    <th>Чт</th>
-                    <th>Пт</th>
-                    <th>Сб</th>
-                    <th>Вс</th>
-                </tr>
-            </thead>
-            <tbody id="calendarBody">
-                <!-- Календарь будет заполнен JavaScript -->
-            </tbody>
-        </table>
     </div>
     
-    <!-- Модальное окно для добавления/редактирования отгрузки -->
-    <div id="shipmentModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modalTitle">Добавить отгрузку</h2>
-            <form id="shipmentForm">
-                <input type="hidden" id="shipmentId">
-                <input type="hidden" id="shipmentDate">
-                
-                <div class="form-group">
-                    <label for="direction">Направление</label>
-                    <input type="text" id="direction">
+    <!-- Модальное окно дня -->
+    <div class="day-modal" id="dayModal">
+        <div class="day-modal-content">
+            <div class="day-modal-header">
+                <div class="day-modal-title" id="dayModalTitle">15 июля, вторник</div>
+                <button class="close-modal" id="closeDayModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="day-modal-body">
+                <div class="shipments-list" id="dayShipmentsList">
+                    <!-- Список отгрузок будет заполнен JavaScript -->
                 </div>
-                
-                <div class="form-group">
-                    <label for="chat">Чат</label>
-                    <input type="text" id="chat">
-                </div>
-                
-                <div class="form-group">
-                    <label for="ip">ИП</label>
-                    <input type="text" id="ip">
-                </div>
-                
-                <div class="form-group">
-                    <label for="quantity">Кол-во</label>
-                    <input type="number" id="quantity">
-                </div>
-                
-                <div class="form-group">
-                    <label for="deliveryType">Тип поставки</label>
-                    <input type="text" id="deliveryType">
-                </div>
-                
-                <div class="form-group">
-                    <label for="slog">Слог</label>
-                    <input type="text" id="slog">
-                </div>
-                
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="print">
-                    <label for="print">Печать</label>
-                </div>
-                
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="status">
-                    <label for="status">Статус сборки от склада</label>
-                </div>
-                
-                <div class="form-group">
-                    <button type="submit" class="btn">Сохранить</button>
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button>
-                    <button type="button" class="btn btn-secondary" id="deleteBtn" style="display: none;">Удалить</button>
-                </div>
-            </form>
+                <button class="btn add-shipment-btn" id="addShipmentToDay">
+                    <i class="fas fa-plus"></i> Добавить отгрузку
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно формы отгрузки -->
+    <div class="shipment-form-modal" id="shipmentFormModal">
+        <div class="shipment-form-content">
+            <div class="form-header">
+                <div class="form-title" id="formTitle">Добавить отгрузку</div>
+                <button class="close-modal" id="closeFormModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-body">
+                <form id="shipmentForm">
+                    <input type="hidden" id="shipmentId">
+                    <input type="hidden" id="shipmentDate">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="direction" class="form-label">Направление</label>
+                            <input type="text" id="direction" class="form-control" placeholder="Куда отправляем">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="chat" class="form-label">Чат</label>
+                            <input type="text" id="chat" class="form-control" placeholder="Ссылка на чат">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ip" class="form-label">ИП</label>
+                            <input type="text" id="ip" class="form-control" placeholder="Имя предпринимателя">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quantity" class="form-label">Кол-во</label>
+                            <input type="number" id="quantity" class="form-control" placeholder="Количество товара">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Тип упаковки</label>
+                        <div class="package-type">
+                            <div class="type-option" id="boxOption">
+                                <i class="fas fa-box"></i>
+                                <div>Короб</div>
+                            </div>
+                            <div class="type-option" id="palletOption">
+                                <i class="fas fa-pallet"></i>
+                                <div>Паллет</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="packageType" value="box">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="deliveryType" class="form-label">Тип поставки</label>
+                            <input type="text" id="deliveryType" class="form-control" placeholder="Тип доставки">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="slot" class="form-label">Слот</label>
+                            <input type="date" id="slot" class="form-control" placeholder="Дата сдачи товара">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="print">
+                        <label for="print" class="checkbox-label">Печать документов</label>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="status">
+                        <label for="status" class="checkbox-label">Сборка завершена</label>
+                    </div>
+                </form>
+            </div>
+            <div class="form-footer">
+                <button class="btn btn-danger" id="deleteShipmentBtn" style="display: none;">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+                <button class="btn btn-secondary" id="cancelShipmentBtn">
+                    Отмена
+                </button>
+                <button class="btn" id="saveShipmentBtn">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+            </div>
         </div>
     </div>
     
     <script>
         // Текущая дата
         let currentDate = new Date();
+        let selectedDay = null;
         let shipments = [];
+        
+        // Статусы отгрузок
+        const STATUSES = {
+            SHIPPED: 'shipped',
+            BARCODE_NEEDED: 'barcode_needed',
+            ASSEMBLED: 'assembled'
+        };
+        
+        // Логистические статусы
+        const LOGISTIC_STATUSES = {
+            CAR_SEARCH: 'car_search',
+            SHIPPED: 'shipped'
+        };
         
         // Элементы DOM
         const calendarBody = document.getElementById('calendarBody');
         const currentMonthElement = document.getElementById('currentMonth');
         const prevMonthBtn = document.getElementById('prevMonth');
         const nextMonthBtn = document.getElementById('nextMonth');
+        const todayBtn = document.getElementById('todayBtn');
         const addShipmentBtn = document.getElementById('addShipmentBtn');
-        const modal = document.getElementById('shipmentModal');
-        const closeBtn = document.querySelector('.close');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const deleteBtn = document.getElementById('deleteBtn');
+        const addShipmentToDayBtn = document.getElementById('addShipmentToDay');
+        
+        // Статистические элементы
+        const totalShipmentsElement = document.getElementById('totalShipments');
+        const shippedCountElement = document.getElementById('shippedCount');
+        const inProgressCountElement = document.getElementById('inProgressCount');
+        const directionStatsElement = document.getElementById('directionStats');
+        
+        // Модальные окна
+        const dayModal = document.getElementById('dayModal');
+        const dayModalTitle = document.getElementById('dayModalTitle');
+        const dayShipmentsList = document.getElementById('dayShipmentsList');
+        const closeDayModal = document.getElementById('closeDayModal');
+        
+        const shipmentFormModal = document.getElementById('shipmentFormModal');
+        const formTitle = document.getElementById('formTitle');
+        const closeFormModal = document.getElementById('closeFormModal');
+        const cancelShipmentBtn = document.getElementById('cancelShipmentBtn');
+        const saveShipmentBtn = document.getElementById('saveShipmentBtn');
+        const deleteShipmentBtn = document.getElementById('deleteShipmentBtn');
         const shipmentForm = document.getElementById('shipmentForm');
-        const modalTitle = document.getElementById('modalTitle');
         
-        // Открыть модальное окно для добавления отгрузки
-        addShipmentBtn.addEventListener('click', () => {
-            document.getElementById('shipmentId').value = '';
-            document.getElementById('shipmentDate').value = '';
-            document.getElementById('direction').value = '';
-            document.getElementById('chat').value = '';
-            document.getElementById('ip').value = '';
-            document.getElementById('quantity').value = '';
-            document.getElementById('deliveryType').value = '';
-            document.getElementById('slog').value = '';
-            document.getElementById('print').checked = false;
-            document.getElementById('status').checked = false;
-            
-            modalTitle.textContent = 'Добавить отгрузку';
-            deleteBtn.style.display = 'none';
-            modal.style.display = 'block';
-        });
+        // Тип упаковки
+        const boxOption = document.getElementById('boxOption');
+        const palletOption = document.getElementById('palletOption');
+        const packageTypeInput = document.getElementById('packageType');
         
-        // Закрыть модальное окно
-        closeBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-        
-        cancelBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-        
-        // Клик вне модального окна закрывает его
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-        
-        // Удалить отгрузку
-        deleteBtn.addEventListener('click', () => {
-            const shipmentId = document.getElementById('shipmentId').value;
-            shipments = shipments.filter(s => s.id !== shipmentId);
-            saveShipments();
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            loadShipments();
             renderCalendar();
-            modal.style.display = 'none';
+            setupEventListeners();
+            updateStatistics();
         });
         
-        // Сохранить отгрузку
-        shipmentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+        function setupEventListeners() {
+            // Навигация по месяцам
+            prevMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+                updateStatistics();
+            });
             
-            const shipment = {
-                id: document.getElementById('shipmentId').value || Date.now().toString(),
-                date: document.getElementById('shipmentDate').value,
-                direction: document.getElementById('direction').value,
-                chat: document.getElementById('chat').value,
-                ip: document.getElementById('ip').value,
-                quantity: document.getElementById('quantity').value,
-                deliveryType: document.getElementById('deliveryType').value,
-                slog: document.getElementById('slog').value,
-                print: document.getElementById('print').checked,
-                status: document.getElementById('status').checked
-            };
+            nextMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+                updateStatistics();
+            });
             
-            // Обновить или добавить отгрузку
-            const index = shipments.findIndex(s => s.id === shipment.id);
-            if (index !== -1) {
-                shipments[index] = shipment;
-            } else {
-                shipments.push(shipment);
-            }
+            todayBtn.addEventListener('click', () => {
+                currentDate = new Date();
+                renderCalendar();
+                updateStatistics();
+            });
             
-            saveShipments();
-            renderCalendar();
-            modal.style.display = 'none';
-        });
-        
-        // Сохранить отгрузки в localStorage
-        function saveShipments() {
-            localStorage.setItem('shipments', JSON.stringify(shipments));
+            // Открыть форму добавления отгрузки
+            addShipmentBtn.addEventListener('click', openShipmentForm);
+            addShipmentToDayBtn.addEventListener('click', openShipmentForm);
+            
+            // Закрыть модальные окна
+            closeDayModal.addEventListener('click', () => {
+                dayModal.classList.remove('active');
+            });
+            
+            closeFormModal.addEventListener('click', () => {
+                shipmentFormModal.classList.remove('active');
+            });
+            
+            cancelShipmentBtn.addEventListener('click', () => {
+                shipmentFormModal.classList.remove('active');
+            });
+            
+            // Сохранить отгрузку
+            saveShipmentBtn.addEventListener('click', saveShipment);
+            
+            // Удалить отгрузку
+            deleteShipmentBtn.addEventListener('click', deleteShipment);
+            
+            // Выбор типа упаковки
+            boxOption.addEventListener('click', () => {
+                boxOption.classList.add('active');
+                palletOption.classList.remove('active');
+                packageTypeInput.value = 'box';
+            });
+            
+            palletOption.addEventListener('click', () => {
+                palletOption.classList.add('active');
+                boxOption.classList.remove('active');
+                packageTypeInput.value = 'pallet';
+            });
         }
         
-        // Загрузить отгрузки из localStorage
-        function loadShipments() {
-            const saved = localStorage.getItem('shipments');
-            if (saved) {
-                shipments = JSON.parse(saved);
-            }
+        // Обновление статистики
+        function updateStatistics() {
+            // Фильтруем отгрузки текущего месяца
+            const currentMonthShipments = shipments.filter(shipment => {
+                const shipmentDate = new Date(shipment.date);
+                return shipmentDate.getMonth() === currentDate.getMonth() && 
+                       shipmentDate.getFullYear() === currentDate.getFullYear();
+            });
+            
+            // Общие показатели
+            totalShipmentsElement.textContent = currentMonthShipments.length;
+            
+            const shippedCount = currentMonthShipments.filter(
+                s => s.warehouseStatus === STATUSES.SHIPPED
+            ).length;
+            shippedCountElement.textContent = shippedCount;
+            
+            const inProgressCount = currentMonthShipments.filter(
+                s => s.warehouseStatus !== STATUSES.SHIPPED
+            ).length;
+            inProgressCountElement.textContent = inProgressCount;
+            
+            // Статистика по направлениям
+            const directionStats = {};
+            currentMonthShipments.forEach(shipment => {
+                const direction = shipment.direction || 'Без направления';
+                if (!directionStats[direction]) {
+                    directionStats[direction] = 0;
+                }
+                directionStats[direction]++;
+            });
+            
+            // Преобразуем в массив и сортируем по убыванию
+            const sortedDirections = Object.entries(directionStats)
+                .sort((a, b) => b[1] - a[1]);
+            
+            // Очищаем контейнер
+            directionStatsElement.innerHTML = '';
+            
+            // Добавляем статистику
+            sortedDirections.forEach(([direction, count]) => {
+                const directionItem = document.createElement('div');
+                directionItem.className = 'direction-item';
+                directionItem.innerHTML = `
+                    <div class="direction-name">${direction}</div>
+                    <div class="direction-count">${count}</div>
+                `;
+                directionStatsElement.appendChild(directionItem);
+            });
         }
-        
-        // Переключение месяцев
-        prevMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        });
-        
-        nextMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
-        });
         
         // Отрисовка календаря
         function renderCalendar() {
             // Обновляем заголовок с месяцем и годом
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+            
             currentMonthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
             
             // Очищаем календарь
@@ -370,63 +1326,76 @@
             // Получаем количество дней в предыдущем месяце
             const daysInLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
             
+            // Текущая дата для сравнения
+            const today = new Date();
+            const isCurrentMonth = currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear();
+            
             let date = 1;
             let nextMonthDate = 1;
             let rows = 6; // Максимальное количество строк в календаре
             
             for (let i = 0; i < rows; i++) {
-                const row = document.createElement('tr');
-                
                 for (let j = 0; j < 7; j++) {
-                    const cell = document.createElement('td');
+                    const cell = document.createElement('div');
+                    cell.className = 'day-cell';
                     
                     if (i === 0 && j < startingDay) {
                         // Дни предыдущего месяца
                         const prevMonthDay = daysInLastMonth - startingDay + j + 1;
-                        cell.innerHTML = `<div class="day-number">${prevMonthDay}</div>`;
-                        cell.style.color = '#ccc';
+                        cell.innerHTML = `
+                            <div class="day-number">${prevMonthDay}</div>
+                            <div class="day-of-week">${dayNames[j+1] || dayNames[0]}</div>
+                        `;
+                        cell.classList.add('other-month');
                     } else if (date > daysInMonth) {
                         // Дни следующего месяца
-                        cell.innerHTML = `<div class="day-number">${nextMonthDate}</div>`;
-                        cell.style.color = '#ccc';
+                        cell.innerHTML = `
+                            <div class="day-number">${nextMonthDate}</div>
+                            <div class="day-of-week">${dayNames[j]}</div>
+                        `;
+                        cell.classList.add('other-month');
                         nextMonthDate++;
                     } else {
                         // Дни текущего месяца
                         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
                         const dateString = formatDate(dayDate);
+                        const dayShipments = shipments.filter(s => s.date === dateString);
                         
-                        cell.className = 'day-cell';
+                        // Проверка, является ли день сегодняшним
+                        if (isCurrentMonth && date === today.getDate()) {
+                            cell.classList.add('today');
+                        }
+                        
+                        // Получаем количество отгрузок с разными статусами
+                        const shippedCount = dayShipments.filter(s => s.warehouseStatus === STATUSES.SHIPPED).length;
+                        const barcodeCount = dayShipments.filter(s => s.warehouseStatus === STATUSES.BARCODE_NEEDED).length;
+                        const assembledCount = dayShipments.filter(s => s.warehouseStatus === STATUSES.ASSEMBLED).length;
+                        
                         cell.innerHTML = `
                             <div class="day-number">${date}</div>
-                            <div class="day-of-week">${getDayOfWeek(j)}</div>
-                            ${renderShipmentsForDate(dateString)}
+                            <div class="day-of-week">${dayNames[j]}</div>
+                            ${dayShipments.length > 0 ? `<span class="shipment-badge">${dayShipments.length}</span>` : ''}
+                            ${dayShipments.length > 0 ? `
+                                <div class="shipment-preview">${dayShipments[0].direction || 'Отгрузка'}</div>
+                                <div style="margin-top: 5px; display: flex; gap: 5px; flex-wrap: wrap;">
+                                    ${shippedCount > 0 ? `<span class="status-indicator status-shipped" title="Отгружено: ${shippedCount}"></span>` : ''}
+                                    ${barcodeCount > 0 ? `<span class="status-indicator status-barcode-needed" title="Нужны ШК: ${barcodeCount}"></span>` : ''}
+                                    ${assembledCount > 0 ? `<span class="status-indicator status-assembled" title="Собрано: ${assembledCount}"></span>` : ''}
+                                </div>
+                            ` : ''}
                         `;
                         
-                        // Обработчик клика для добавления отгрузки
+                        // Обработчик клика для открытия списка отгрузок
                         cell.addEventListener('click', () => {
-                            document.getElementById('shipmentId').value = '';
-                            document.getElementById('shipmentDate').value = dateString;
-                            document.getElementById('direction').value = '';
-                            document.getElementById('chat').value = '';
-                            document.getElementById('ip').value = '';
-                            document.getElementById('quantity').value = '';
-                            document.getElementById('deliveryType').value = '';
-                            document.getElementById('slog').value = '';
-                            document.getElementById('print').checked = false;
-                            document.getElementById('status').checked = false;
-                            
-                            modalTitle.textContent = `Добавить отгрузку на ${date}.${currentDate.getMonth() + 1}.${currentDate.getFullYear()}`;
-                            deleteBtn.style.display = 'none';
-                            modal.style.display = 'block';
+                            selectedDay = dayDate;
+                            openDayModal(dayDate, dayShipments);
                         });
                         
                         date++;
                     }
                     
-                    row.appendChild(cell);
+                    calendarBody.appendChild(cell);
                 }
-                
-                calendarBody.appendChild(row);
                 
                 // Прекращаем создание строк, если все дни месяца отображены
                 if (date > daysInMonth && nextMonthDate > 7) {
@@ -435,29 +1404,342 @@
             }
         }
         
-        // Отрисовка отгрузок для конкретной даты
-        function renderShipmentsForDate(date) {
-            const dayShipments = shipments.filter(s => s.date === date);
-            if (dayShipments.length === 0) return '';
+        // Открыть модальное окно дня
+        function openDayModal(date, dayShipments) {
+            const monthNames = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+            const fullDayNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
             
-            let html = '';
-            dayShipments.forEach(shipment => {
-                html += `
-                    <div class="shipment-item" data-id="${shipment.id}">
-                        <div>${shipment.direction || 'Направление не указано'}</div>
-                        ${shipment.print ? '<span class="checkmark">✓</span>' : ''}
-                        ${shipment.status ? '<span class="checkmark">✓</span>' : ''}
+            const dayOfWeek = fullDayNames[date.getDay()];
+            const dayNumber = date.getDate();
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            
+            dayModalTitle.textContent = `${dayNumber} ${month} ${year}, ${dayOfWeek}`;
+            
+            // Очищаем список отгрузок
+            dayShipmentsList.innerHTML = '';
+            
+            if (dayShipments.length === 0) {
+                dayShipmentsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Нет отгрузок</h3>
+                        <p>На этот день не запланировано отгрузок</p>
                     </div>
                 `;
-            });
+            } else {
+                dayShipments.forEach(shipment => {
+                    const shipmentElement = document.createElement('div');
+                    shipmentElement.className = 'shipment-card';
+                    shipmentElement.innerHTML = `
+                        <div class="shipment-header">
+                            <div class="shipment-direction">${shipment.direction || 'Направление не указано'}</div>
+                            <div class="shipment-actions">
+                                <button class="action-btn edit-shipment" data-id="${shipment.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-shipment" data-id="${shipment.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="shipment-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Чат:</span>
+                                <span class="detail-value">${shipment.chat || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">ИП:</span>
+                                <span class="detail-value">${shipment.ip || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Кол-во:</span>
+                                <span class="detail-value">${shipment.quantity || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Тип упаковки:</span>
+                                <span class="detail-value">${shipment.packageType === 'pallet' ? 'Паллет' : 'Короб'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Тип поставки:</span>
+                                <span class="detail-value">${shipment.deliveryType || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Слот:</span>
+                                <span class="detail-value">${formatDisplayDate(shipment.slot) || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Печать:</span>
+                                <span class="detail-value">${shipment.print ? '<i class="fas fa-check checkmark"></i>' : '<i class="fas fa-times crossmark"></i>'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Сборка:</span>
+                                <span class="detail-value">${shipment.status ? '<i class="fas fa-check checkmark"></i>' : '<i class="fas fa-times crossmark"></i>'}</span>
+                            </div>
+                        </div>
+                        <div class="status-section">
+                            <div class="status-title">
+                                <i class="fas fa-warehouse"></i> Статус склада
+                            </div>
+                            <div class="status-options warehouse-status" data-shipment="${shipment.id}">
+                                <button class="status-btn shipped ${shipment.warehouseStatus === STATUSES.SHIPPED ? 'active' : ''}" data-status="${STATUSES.SHIPPED}">
+                                    <i class="fas fa-truck"></i> Отгружен
+                                </button>
+                                <button class="status-btn barcode-needed ${shipment.warehouseStatus === STATUSES.BARCODE_NEEDED ? 'active' : ''}" data-status="${STATUSES.BARCODE_NEEDED}">
+                                    <i class="fas fa-barcode"></i> Нужны ШК
+                                </button>
+                                <button class="status-btn assembled ${shipment.warehouseStatus === STATUSES.ASSEMBLED ? 'active' : ''}" data-status="${STATUSES.ASSEMBLED}">
+                                    <i class="fas fa-boxes"></i> Собран
+                                </button>
+                            </div>
+                        </div>
+                        <div class="status-section">
+                            <div class="status-title">
+                                <i class="fas fa-user-tie"></i> Статус логиста
+                            </div>
+                            <div class="status-options logistic-status" data-shipment="${shipment.id}">
+                                <button class="status-btn ${shipment.logisticStatus === LOGISTIC_STATUSES.CAR_SEARCH ? 'active' : ''}" data-status="${LOGISTIC_STATUSES.CAR_SEARCH}">
+                                    <i class="fas fa-car"></i> Поиск авто
+                                </button>
+                                <button class="status-btn ${shipment.logisticStatus === LOGISTIC_STATUSES.SHIPPED ? 'active' : ''}" data-status="${LOGISTIC_STATUSES.SHIPPED}">
+                                    <i class="fas fa-check-circle"></i> Отгружен
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    dayShipmentsList.appendChild(shipmentElement);
+                });
+                
+                // Добавляем обработчики для кнопок редактирования и удаления
+                document.querySelectorAll('.edit-shipment').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const shipmentId = btn.getAttribute('data-id');
+                        editShipment(shipmentId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-shipment').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const shipmentId = btn.getAttribute('data-id');
+                        if (confirm('Вы уверены, что хотите удалить эту отгрузку?')) {
+                            deleteShipment(shipmentId);
+                        }
+                    });
+                });
+                
+                // Добавляем обработчики для статусов склада
+                document.querySelectorAll('.warehouse-status .status-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const shipmentId = this.parentElement.getAttribute('data-shipment');
+                        const status = this.getAttribute('data-status');
+                        updateWarehouseStatus(shipmentId, status);
+                    });
+                });
+                
+                // Добавляем обработчики для статусов логиста
+                document.querySelectorAll('.logistic-status .status-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const shipmentId = this.parentElement.getAttribute('data-shipment');
+                        const status = this.getAttribute('data-status');
+                        updateLogisticStatus(shipmentId, status);
+                    });
+                });
+            }
             
-            return html;
+            // Устанавливаем дату для добавления новой отгрузки
+            document.getElementById('shipmentDate').value = formatDate(date);
+            
+            // Показываем модальное окно
+            dayModal.classList.add('active');
         }
         
-        // Получить день недели
-        function getDayOfWeek(dayIndex) {
-            const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-            return days[dayIndex];
+        // Обновить статус склада
+        function updateWarehouseStatus(shipmentId, status) {
+            const shipment = shipments.find(s => s.id === shipmentId);
+            if (shipment) {
+                shipment.warehouseStatus = status;
+                saveShipments();
+                
+                // Обновляем UI
+                const statusButtons = document.querySelectorAll(`.warehouse-status[data-shipment="${shipmentId}"] .status-btn`);
+                statusButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-status') === status) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Обновляем календарь и статистику
+                renderCalendar();
+                updateStatistics();
+            }
+        }
+        
+        // Обновить статус логиста
+        function updateLogisticStatus(shipmentId, status) {
+            const shipment = shipments.find(s => s.id === shipmentId);
+            if (shipment) {
+                shipment.logisticStatus = status;
+                saveShipments();
+                
+                // Обновляем UI
+                const statusButtons = document.querySelectorAll(`.logistic-status[data-shipment="${shipmentId}"] .status-btn`);
+                statusButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-status') === status) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+        
+        // Открыть форму отгрузки
+        function openShipmentForm() {
+            // Сбрасываем форму
+            document.getElementById('shipmentId').value = '';
+            document.getElementById('direction').value = '';
+            document.getElementById('chat').value = '';
+            document.getElementById('ip').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('deliveryType').value = '';
+            document.getElementById('slot').value = '';
+            document.getElementById('print').checked = false;
+            document.getElementById('status').checked = false;
+            
+            // Тип упаковки
+            boxOption.classList.add('active');
+            palletOption.classList.remove('active');
+            packageTypeInput.value = 'box';
+            
+            formTitle.textContent = 'Добавить отгрузку';
+            deleteShipmentBtn.style.display = 'none';
+            
+            // Показываем модальное окно
+            shipmentFormModal.classList.add('active');
+        }
+        
+        // Редактировать отгрузку
+        function editShipment(shipmentId) {
+            const shipment = shipments.find(s => s.id === shipmentId);
+            if (!shipment) return;
+            
+            // Заполняем форму
+            document.getElementById('shipmentId').value = shipment.id;
+            document.getElementById('shipmentDate').value = shipment.date;
+            document.getElementById('direction').value = shipment.direction || '';
+            document.getElementById('chat').value = shipment.chat || '';
+            document.getElementById('ip').value = shipment.ip || '';
+            document.getElementById('quantity').value = shipment.quantity || '';
+            document.getElementById('deliveryType').value = shipment.deliveryType || '';
+            document.getElementById('slot').value = shipment.slot || '';
+            document.getElementById('print').checked = shipment.print || false;
+            document.getElementById('status').checked = shipment.status || false;
+            
+            // Тип упаковки
+            if (shipment.packageType === 'pallet') {
+                palletOption.classList.add('active');
+                boxOption.classList.remove('active');
+                packageTypeInput.value = 'pallet';
+            } else {
+                boxOption.classList.add('active');
+                palletOption.classList.remove('active');
+                packageTypeInput.value = 'box';
+            }
+            
+            formTitle.textContent = 'Редактировать отгрузку';
+            deleteShipmentBtn.style.display = 'block';
+            
+            // Показываем модальное окно
+            dayModal.classList.remove('active');
+            shipmentFormModal.classList.add('active');
+        }
+        
+        // Сохранить отгрузку
+        function saveShipment() {
+            const shipment = {
+                id: document.getElementById('shipmentId').value || generateId(),
+                date: document.getElementById('shipmentDate').value,
+                direction: document.getElementById('direction').value,
+                chat: document.getElementById('chat').value,
+                ip: document.getElementById('ip').value,
+                quantity: document.getElementById('quantity').value,
+                packageType: packageTypeInput.value,
+                deliveryType: document.getElementById('deliveryType').value,
+                slot: document.getElementById('slot').value,
+                print: document.getElementById('print').checked,
+                status: document.getElementById('status').checked,
+                warehouseStatus: document.getElementById('shipmentId').value 
+                    ? shipments.find(s => s.id === document.getElementById('shipmentId').value)?.warehouseStatus 
+                    : STATUSES.ASSEMBLED,
+                logisticStatus: document.getElementById('shipmentId').value 
+                    ? shipments.find(s => s.id === document.getElementById('shipmentId').value)?.logisticStatus 
+                    : LOGISTIC_STATUSES.CAR_SEARCH
+            };
+            
+            // Обновить или добавить отгрузку
+            const index = shipments.findIndex(s => s.id === shipment.id);
+            if (index !== -1) {
+                shipments[index] = shipment;
+            } else {
+                shipments.push(shipment);
+            }
+            
+            saveShipments();
+            renderCalendar();
+            updateStatistics();
+            
+            // Обновляем список отгрузок в модальном окне дня, если оно открыто
+            if (selectedDay) {
+                const dateString = formatDate(selectedDay);
+                const dayShipments = shipments.filter(s => s.date === dateString);
+                openDayModal(selectedDay, dayShipments);
+            }
+            
+            shipmentFormModal.classList.remove('active');
+        }
+        
+        // Удалить отгрузку
+        function deleteShipment(shipmentId = null) {
+            if (!shipmentId) {
+                shipmentId = document.getElementById('shipmentId').value;
+            }
+            
+            shipments = shipments.filter(s => s.id !== shipmentId);
+            saveShipments();
+            renderCalendar();
+            updateStatistics();
+            
+            // Обновляем список отгрузок в модальном окне дня, если оно открыто
+            if (selectedDay) {
+                const dateString = formatDate(selectedDay);
+                const dayShipments = shipments.filter(s => s.date === dateString);
+                openDayModal(selectedDay, dayShipments);
+            }
+            
+            shipmentFormModal.classList.remove('active');
+        }
+        
+        // Генератор ID
+        function generateId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        // Сохранить отгрузки в localStorage
+        function saveShipments() {
+            localStorage.setItem('shipments', JSON.stringify(shipments));
+        }
+        
+        // Загрузить отгрузки из localStorage
+        function loadShipments() {
+            const saved = localStorage.getItem('shipments');
+            if (saved) {
+                shipments = JSON.parse(saved);
+            }
         }
         
         // Форматировать дату в YYYY-MM-DD
@@ -473,41 +1755,17 @@
             return [year, month, day].join('-');
         }
         
-        // Инициализация
-        function init() {
-            loadShipments();
-            renderCalendar();
+        // Форматировать дату для отображения
+        function formatDisplayDate(dateString) {
+            if (!dateString) return '';
             
-            // Обработчик клика по отгрузке для редактирования
-            document.addEventListener('click', (e) => {
-                const shipmentItem = e.target.closest('.shipment-item');
-                if (shipmentItem) {
-                    e.stopPropagation();
-                    const shipmentId = shipmentItem.getAttribute('data-id');
-                    const shipment = shipments.find(s => s.id === shipmentId);
-                    
-                    if (shipment) {
-                        document.getElementById('shipmentId').value = shipment.id;
-                        document.getElementById('shipmentDate').value = shipment.date;
-                        document.getElementById('direction').value = shipment.direction || '';
-                        document.getElementById('chat').value = shipment.chat || '';
-                        document.getElementById('ip').value = shipment.ip || '';
-                        document.getElementById('quantity').value = shipment.quantity || '';
-                        document.getElementById('deliveryType').value = shipment.deliveryType || '';
-                        document.getElementById('slog').value = shipment.slog || '';
-                        document.getElementById('print').checked = shipment.print || false;
-                        document.getElementById('status').checked = shipment.status || false;
-                        
-                        const dateParts = shipment.date.split('-');
-                        modalTitle.textContent = `Редактировать отгрузку на ${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
-                        deleteBtn.style.display = 'block';
-                        modal.style.display = 'block';
-                    }
-                }
-            });
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${day}.${month}.${year}`;
         }
-        
-        init();
     </script>
 </body>
 </html>
